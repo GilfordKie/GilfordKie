@@ -1,0 +1,67 @@
+ function showScenicSpot(code){
+        	$.ajax({  
+		        type:"get",  
+		        url:prefix + "/datalist/" + code,  
+		        dataType:"json",  
+		        cache:false,
+		        processData:false,
+		        success:function(result){
+		        	if(result.code == web_status.SUCCESS){
+		        		var strokeStyleSet = "#23168d";
+		        		var lat,lng,cityInfo;
+		        		for(var i=0;i<result.data.length;i++){
+		        			var dataInfo = result.data[i];
+		        			var geomObj = JSON.parse(dataInfo.geomJson);
+		        			if(i == 0){
+		        				lat = geomObj.coordinates[1];
+		        				lng = geomObj.coordinates[0];
+		        				continue;
+		        			}
+		        			var radiusSize = 5;
+		        			switch(dataInfo.level) {
+			        		    case '5A':  
+			        		    	strokeStyleSet = "#c50808";
+			        		    	radiusSize += 7;
+			        		        break;
+			        		    case '4A':  
+			        		    	strokeStyleSet = "#c37322";
+			        		    	radiusSize += 5;
+			        		        break;
+			        		    case '3A':
+			        		    	strokeStyleSet = "#6f8d16";
+			        		    	radiusSize += 3;
+			        		        break;
+		        		        case '2A':
+		        		        	strokeStyleSet = "#168d40";
+		        		        	radiusSize += 1;
+			        		        break;
+			        		    default:
+			        		    	strokeStyleSet = "#23168d";
+			        		}
+		    				var content = "<strong>名称:</strong>"+dataInfo.name + "<br/><strong>级别:</strong>"+ dataInfo.level;
+		    				    content += "<br/><strong>所属行政区划:</strong>"+ dataInfo.province + "/" + dataInfo.city + "/" + dataInfo.area;
+		    				    content += "<br/><strong>评定时间:</strong>"+ dataInfo.evaluationTime ;
+		    				var latlng = new L.latLng(geomObj.coordinates[1], geomObj.coordinates[0]);
+		    			    let marker = L.circleMarker(latlng, {
+		        		        radius: radiusSize,
+		        		        color: strokeStyleSet,
+		        		        labelStyle: {
+		        		          offsetX: 0, //横坐标偏移(像素)
+		        		          offsetY: 30, //纵坐标偏移(像素)
+		        		          text: dataInfo.name,
+		        		          rotation: 0,
+		        		          zIndex: radiusSize,
+		        				  minZoom : 5,
+		        				  strokeStyle: strokeStyleSet
+		        		        }
+	        		      	}).addTo(showLayerGroup);
+		    				marker.bindPopup(content); 
+		        		}
+		        		mymap.addLayer(showLayerGroup);
+		        	}
+		        },
+		        error:function(){
+		        	$.modal.alertWarning("获取信息失败");
+		        }
+		    });
+        }
