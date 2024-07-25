@@ -1,0 +1,16 @@
+import pandas as pd  
+  
+# 假设df是已经加载到Pandas DataFrame中的数据集  
+# 处理缺失值  
+df.fillna({'age': df['age'].mean(), 'income': 0}, inplace=True)  
+  
+# 检测并处理异常值（以年龄为例）  
+df = df[df['age'].between(0, 120)]  
+  
+# 编码转换（以性别为例，假设性别为'male'和'female'）  
+df['gender'] = pd.Categorical(df['gender']).codes  
+  
+# 数据标准化（以收入为例）  
+from sklearn.preprocessing import StandardScaler  
+scaler = StandardScaler()  
+df['income_scaled'] = scaler.fit_transform(df[['income']])
